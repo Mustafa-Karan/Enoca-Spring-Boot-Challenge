@@ -1,10 +1,12 @@
 package com.Enoca_Challenge.Enoca.service;
+
 import com.Enoca_Challenge.Enoca.entity.Course;
 import com.Enoca_Challenge.Enoca.entity.Teacher;
 import com.Enoca_Challenge.Enoca.repository.CourseRepository;
 import com.Enoca_Challenge.Enoca.repository.TeacherRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -13,6 +15,17 @@ public class CourseService {
 
     private final CourseRepository courseRepository;
     private final TeacherRepository teacherRepository;
+
+    // Tüm kursları getir
+    public List<Course> getAllCourses() {
+        return courseRepository.findByIsAvailableTrueAndIsActiveTrue();
+    }
+
+    // Tek kurs getir
+    public Course getCourseById(Long id) {
+        return courseRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Kurs bulunamadı: " + id));
+    }
 
     // Öğretmenin kurslarını getir (GetAllCoursesForTeacher)
     public List<Course> getAllCoursesForTeacher(Long teacherId) {

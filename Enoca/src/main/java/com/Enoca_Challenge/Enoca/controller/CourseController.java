@@ -1,10 +1,12 @@
 package com.Enoca_Challenge.Enoca.controller;
+
 import com.Enoca_Challenge.Enoca.entity.Course;
 import com.Enoca_Challenge.Enoca.service.CourseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-        import java.util.List;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -13,25 +15,59 @@ public class CourseController {
 
     private final CourseService courseService;
 
+    // Tüm kursları getir
+    @GetMapping("/courses")
+    public ResponseEntity<List<Course>> getAllCourses() {
+        try {
+            List<Course> courses = courseService.getAllCourses();
+            return ResponseEntity.ok(courses);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    // Tek kurs getir
+    @GetMapping("/courses/{id}")
+    public ResponseEntity<Course> getCourse(@PathVariable Long id) {
+        try {
+            Course course = courseService.getCourseById(id);
+            return ResponseEntity.ok(course);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     // Öğretmenin kurslarını getir (GetAllCoursesForTeacher)
     @GetMapping("/teachers/{teacherId}/courses")
     public ResponseEntity<List<Course>> getAllCoursesForTeacher(@PathVariable Long teacherId) {
-        List<Course> courses = courseService.getAllCoursesForTeacher(teacherId);
-        return ResponseEntity.ok(courses);
+        try {
+            List<Course> courses = courseService.getAllCoursesForTeacher(teacherId);
+            return ResponseEntity.ok(courses);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     // Öğrencinin kurslarını getir (GetCoursesForStudent)
     @GetMapping("/students/{studentId}/courses")
     public ResponseEntity<List<Course>> getCoursesForStudent(@PathVariable Long studentId) {
-        List<Course> courses = courseService.getCoursesForStudent(studentId);
-        return ResponseEntity.ok(courses);
+        try {
+            List<Course> courses = courseService.getCoursesForStudent(studentId);
+            return ResponseEntity.ok(courses);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     // Öğretmen için kurs oluştur (CreateCourseForTeacher)
     @PostMapping("/teachers/{teacherId}/courses")
     public ResponseEntity<Course> createCourseForTeacher(@PathVariable Long teacherId, @RequestBody Course course) {
-        Course createdCourse = courseService.createCourseForTeacher(teacherId, course);
-        return ResponseEntity.ok(createdCourse);
+        try {
+            Course createdCourse = courseService.createCourseForTeacher(teacherId, course);
+            return ResponseEntity.ok(createdCourse);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     // Öğretmenin kursunu güncelle (UpdateCourseForTeacher)
@@ -40,8 +76,12 @@ public class CourseController {
             @PathVariable Long teacherId,
             @PathVariable Long courseId,
             @RequestBody Course course) {
-        Course updatedCourse = courseService.updateCourseForTeacher(teacherId, courseId, course);
-        return ResponseEntity.ok(updatedCourse);
+        try {
+            Course updatedCourse = courseService.updateCourseForTeacher(teacherId, courseId, course);
+            return ResponseEntity.ok(updatedCourse);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     // Öğretmenin kursunu sil (DeleteCourseForTeacher)
@@ -49,7 +89,11 @@ public class CourseController {
     public ResponseEntity<String> deleteCourseForTeacher(
             @PathVariable Long teacherId,
             @PathVariable Long courseId) {
-        courseService.deleteCourseForTeacher(teacherId, courseId);
-        return ResponseEntity.ok("Kurs silindi");
+        try {
+            courseService.deleteCourseForTeacher(teacherId, courseId);
+            return ResponseEntity.ok("Kurs silindi");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Hata: " + e.getMessage());
+        }
     }
 }

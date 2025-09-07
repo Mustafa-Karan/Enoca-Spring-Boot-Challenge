@@ -1,14 +1,18 @@
 package com.Enoca_Challenge.Enoca.entity;
+
 import jakarta.persistence.*;
-        import lombok.Data;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import java.time.LocalDateTime;
 
 @MappedSuperclass
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Base_Entity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "created_at")

@@ -1,9 +1,11 @@
 package com.Enoca_Challenge.Enoca.controller;
+
 import com.Enoca_Challenge.Enoca.entity.Teacher;
 import com.Enoca_Challenge.Enoca.service.TeacherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -18,6 +20,13 @@ public class TeacherController {
     public ResponseEntity<List<Teacher>> getTeachers() {
         List<Teacher> teachers = teacherService.getTeachers();
         return ResponseEntity.ok(teachers);
+    }
+
+    // Tek öğretmen getir
+    @GetMapping("/{id}")
+    public ResponseEntity<Teacher> getTeacher(@PathVariable Long id) {
+        Teacher teacher = teacherService.getTeacherById(id);
+        return ResponseEntity.ok(teacher);
     }
 
     // Öğretmen oluştur (CreateTeacher)

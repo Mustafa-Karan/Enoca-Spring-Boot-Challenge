@@ -1,7 +1,10 @@
 package com.Enoca_Challenge.Enoca.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -10,8 +13,11 @@ import java.util.Set;
 @Entity
 @Table(name = "carts")
 @Data
+@EqualsAndHashCode(callSuper = true, exclude = {"student", "items"})
+@ToString(exclude = {"student", "items"})
 public class Cart extends Base_Entity {
 
+    @JsonIgnore
     @OneToOne
     @JoinColumn(name = "student_id")
     private Student student;

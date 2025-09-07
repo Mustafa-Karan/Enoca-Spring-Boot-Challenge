@@ -1,10 +1,11 @@
 package com.Enoca_Challenge.Enoca.service;
+
 import com.Enoca_Challenge.Enoca.entity.Cart;
 import com.Enoca_Challenge.Enoca.entity.CartItem;
 import com.Enoca_Challenge.Enoca.entity.Course;
 import com.Enoca_Challenge.Enoca.entity.Student;
 import com.Enoca_Challenge.Enoca.repository.*;
-        import lombok.RequiredArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +59,8 @@ public class CartService {
         Cart cart = getCart(studentId);
         cartItemRepository.deleteByCartIdAndCourseId(cart.getId(), courseId);
 
+        // Cart'ı yeniden yükle
+        cart = cartRepository.findById(cart.getId()).orElse(cart);
         cart.getItems().removeIf(item -> item.getCourse().getId().equals(courseId));
         cart.calculateTotalPrice();
 
@@ -74,6 +77,7 @@ public class CartService {
     // Sepeti boşalt (EmptyCart)
     public void emptyCart(Long studentId) {
         Cart cart = getCart(studentId);
+        cartItemRepository.deleteAll(cart.getItems());
         cart.getItems().clear();
         cart.calculateTotalPrice();
         cartRepository.save(cart);

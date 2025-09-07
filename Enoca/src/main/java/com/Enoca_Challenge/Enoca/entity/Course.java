@@ -1,7 +1,10 @@
 package com.Enoca_Challenge.Enoca.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -10,6 +13,8 @@ import java.util.Set;
 @Entity
 @Table(name = "courses")
 @Data
+@EqualsAndHashCode(callSuper = true, exclude = {"teacher", "enrolledStudents", "cartItems", "orderItems"})
+@ToString(exclude = {"teacher", "enrolledStudents", "cartItems", "orderItems"})
 public class Course extends Base_Entity {
 
     @Column(name = "title")
@@ -34,6 +39,7 @@ public class Course extends Base_Entity {
     @JoinColumn(name = "teacher_id")
     private Teacher teacher;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "course_students",
@@ -42,9 +48,11 @@ public class Course extends Base_Entity {
     )
     private Set<Student> enrolledStudents = new HashSet<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     private Set<CartItem> cartItems = new HashSet<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     private Set<OrderItem> orderItems = new HashSet<>();
 

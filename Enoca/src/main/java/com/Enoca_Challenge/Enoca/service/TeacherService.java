@@ -1,8 +1,10 @@
 package com.Enoca_Challenge.Enoca.service;
+
 import com.Enoca_Challenge.Enoca.entity.Teacher;
 import com.Enoca_Challenge.Enoca.repository.TeacherRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -14,6 +16,12 @@ public class TeacherService {
     // Öğretmenleri getir (GetTeachers)
     public List<Teacher> getTeachers() {
         return teacherRepository.findByIsActiveTrue();
+    }
+
+    // Tek öğretmen getir
+    public Teacher getTeacherById(Long id) {
+        return teacherRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Öğretmen bulunamadı: " + id));
     }
 
     // Öğretmen oluştur (CreateTeacher)
@@ -28,6 +36,12 @@ public class TeacherService {
     public Teacher updateTeacher(Long id, Teacher teacherData) {
         Teacher teacher = teacherRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Öğretmen bulunamadı: " + id));
+
+        // Email güncelleniyorsa, başka birinde var mı kontrol et
+        if (!teacher.getEmail().equals(teacherData.getEmail()) &&
+                teacherRepository.existsByEmail(teacherData.getEmail())) {
+            throw new RuntimeException("Bu email zaten kayıtlı: " + teacherData.getEmail());
+        }
 
         teacher.setFirstName(teacherData.getFirstName());
         teacher.setLastName(teacherData.getLastName());
