@@ -1,4 +1,4 @@
-package com.Enoca_Challenge.Enoca.entity;
+package com.Enoca_Challenge.Enoca;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
