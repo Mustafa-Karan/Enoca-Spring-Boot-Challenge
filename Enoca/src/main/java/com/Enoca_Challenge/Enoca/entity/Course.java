@@ -15,28 +15,22 @@ import java.util.Set;
 @Data
 @EqualsAndHashCode(callSuper = true, exclude = {"teacher", "enrolledStudents", "cartItems", "orderItems"})
 @ToString(exclude = {"teacher", "enrolledStudents", "cartItems", "orderItems"})
-public class Course extends Base_Entity {
+public class Course extends BaseEntity {
 
-    @Column(name = "title")
     private String title;
 
-    @Column(name = "description")
     private String description;
 
-    @Column(name = "price", precision = 10, scale = 2)
+    @Column(precision = 10, scale = 2)
     private BigDecimal price;
 
-    @Column(name = "max_students")
     private Integer maxStudents;
 
-    @Column(name = "current_students")
     private Integer currentStudents = 0;
 
-    @Column(name = "is_available")
     private Boolean isAvailable = true;
 
     @ManyToOne
-    @JoinColumn(name = "teacher_id")
     private Teacher teacher;
 
     @JsonIgnore
@@ -56,8 +50,9 @@ public class Course extends Base_Entity {
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     private Set<OrderItem> orderItems = new HashSet<>();
 
-    // Kurs kaydı yapılabilir mi kontrolü
+    // Check if course enrollment is available
     public boolean canEnroll() {
-        return currentStudents < maxStudents && isAvailable && getIsActive();
+        return currentStudents < maxStudents && isAvailable && getIsActive() &&
+                teacher != null && teacher.getIsActive();
     }
 }

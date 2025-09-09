@@ -15,24 +15,36 @@ public class StudentController {
 
     private final StudentService studentService;
 
-    // Müşteri ekleme (AddCustomer)
+    // Add customer (student)
     @PostMapping
     public ResponseEntity<Student> addCustomer(@RequestBody Student student) {
-        Student createdStudent = studentService.addCustomer(student);
-        return ResponseEntity.ok(createdStudent);
+        try {
+            Student createdStudent = studentService.addCustomer(student);
+            return ResponseEntity.ok(createdStudent);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    // Tüm müşterileri getir
+    // Get all customers
     @GetMapping
     public ResponseEntity<List<Student>> getAllCustomers() {
-        List<Student> students = studentService.getAllStudents();
-        return ResponseEntity.ok(students);
+        try {
+            List<Student> students = studentService.getAllStudents();
+            return ResponseEntity.ok(students);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    // Tek müşteri getir
+    // Get single customer
     @GetMapping("/{id}")
     public ResponseEntity<Student> getStudent(@PathVariable Long id) {
-        Student student = studentService.getStudentById(id);
-        return ResponseEntity.ok(student);
+        try {
+            Student student = studentService.getStudentById(id);
+            return ResponseEntity.ok(student);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

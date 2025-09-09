@@ -16,43 +16,66 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final TeacherRepository teacherRepository;
 
-    // Tüm kursları getir
+    // Get all available courses (only active teachers and active courses)
     public List<Course> getAllCourses() {
-        return courseRepository.findByIsAvailableTrueAndIsActiveTrue();
+        return courseRepository.findAvailableCourses();
     }
 
-    // Tek kurs getir
+    // Get single course by ID
     public Course getCourseById(Long id) {
-        return courseRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Kurs bulunamadı: " + id));
+        Course course = courseRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Course not found: " + id));
+
+        // Check if teacher is still active
+        if (!course.getTeacher().getIsActive()) {
+            throw new RuntimeException("Course is not available - teacher is inactive");
+        }
+
+        return course;
     }
 
-    // Öğretmenin kurslarını getir (GetAllCoursesForTeacher)
+    // Get all courses for active teacher
     public List<Course> getAllCoursesForTeacher(Long teacherId) {
-        return courseRepository.findByTeacherId(teacherId);
+        // First verify teacher is active
+        Teacher teacher = teacherRepository.findById(teacherId)
+                .orElseThrow(() -> new RuntimeException("Teacher not found: " + teacherId));
+
+        if (!teacher.getIsActive()) {
+            throw new RuntimeException("Teacher is inactive");
+        }
+
+        return courseRepository.findByTeacherIdAndTeacherActive(teacherId);
     }
 
-    // Öğrencinin kurslarını getir (GetCoursesForStudent)
+    // Get enrolled courses for student
     public List<Course> getCoursesForStudent(Long studentId) {
         return courseRepository.findByStudentId(studentId);
     }
 
-    // Öğretmen için kurs oluştur (CreateCourseForTeacher)
+    // Create course for teacher
     public Course createCourseForTeacher(Long teacherId, Course course) {
         Teacher teacher = teacherRepository.findById(teacherId)
-                .orElseThrow(() -> new RuntimeException("Öğretmen bulunamadı: " + teacherId));
+                .orElseThrow(() -> new RuntimeException("Teacher not found: " + teacherId));
+
+        if (!teacher.getIsActive()) {
+            throw new RuntimeException("Cannot create course - teacher is inactive");
+        }
 
         course.setTeacher(teacher);
         return courseRepository.save(course);
     }
 
-    // Öğretmenin kursunu güncelle (UpdateCourseForTeacher)
+    // Update course for teacher
     public Course updateCourseForTeacher(Long teacherId, Long courseId, Course courseData) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("Kurs bulunamadı: " + courseId));
+                .orElseThrow(() -> new RuntimeException("Course not found: " + courseId));
 
         if (!course.getTeacher().getId().equals(teacherId)) {
-            throw new RuntimeException("Bu kurs bu öğretmene ait değil");
+            throw new RuntimeException("This course does not belong to this teacher");
+        }
+
+        if (!course.getTeacher().getIsActive()) {
+            throw new RuntimeException("Cannot update course - teacher is inactive");
         }
 
         course.setTitle(courseData.getTitle());
@@ -64,13 +87,13 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
-    // Öğretmenin kursunu sil (DeleteCourseForTeacher)
+    // Delete course for teacher (soft delete)
     public void deleteCourseForTeacher(Long teacherId, Long courseId) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("Kurs bulunamadı: " + courseId));
+                .orElseThrow(() -> new RuntimeException("Course not found: " + courseId));
 
         if (!course.getTeacher().getId().equals(teacherId)) {
-            throw new RuntimeException("Bu kurs bu öğretmene ait değil");
+            throw new RuntimeException("This course does not belong to this teacher");
         }
 
         course.setIsActive(false);

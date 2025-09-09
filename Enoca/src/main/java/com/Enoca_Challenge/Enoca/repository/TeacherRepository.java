@@ -1,4 +1,5 @@
 package com.Enoca_Challenge.Enoca.repository;
+
 import com.Enoca_Challenge.Enoca.entity.Teacher;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

@@ -12,25 +12,23 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "'orders'")
+@Table(name = "orders")
 @Data
 @EqualsAndHashCode(callSuper = true, exclude = {"student", "items"})
 @ToString(exclude = {"student", "items"})
-public class CustomerOrder extends Base_Entity {
+public class CustomerOrder extends BaseEntity {
 
-    @Column(name = "order_code", unique = true)
+    @Column(unique = true)
     private String orderCode = UUID.randomUUID().toString();
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "student_id")
     private Student student;
 
-    @Column(name = "total_price", precision = 10, scale = 2)
+    @Column(precision = 10, scale = 2)
     private BigDecimal totalPrice = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
     private OrderStatus status = OrderStatus.PENDING;
 
     @OneToMany(mappedBy = "customerOrder", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -40,7 +38,7 @@ public class CustomerOrder extends Base_Entity {
         PENDING, CONFIRMED, CANCELLED
     }
 
-    // Toplam fiyatı hesapla
+    // Calculate total price from order items
     public void calculateTotalPrice() {
         this.totalPrice = items.stream()
                 .map(OrderItem::getPrice)

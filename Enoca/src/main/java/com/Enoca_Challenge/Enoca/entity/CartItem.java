@@ -13,17 +13,15 @@ import java.math.BigDecimal;
 @Data
 @EqualsAndHashCode(callSuper = true, exclude = {"cart", "course"})
 @ToString(exclude = {"cart"})
-public class CartItem extends Base_Entity {
+public class CartItem extends BaseEntity {
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "cart_id")
     private Cart cart;
 
     @ManyToOne
-    @JoinColumn(name = "course_id")
     private Course course;
 
-    @Column(name = "price", precision = 10, scale = 2)
+    @Column(precision = 10, scale = 2)
     private BigDecimal price;
 }

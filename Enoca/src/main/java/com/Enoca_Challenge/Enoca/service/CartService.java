@@ -19,29 +19,29 @@ public class CartService {
     private final CourseRepository courseRepository;
     private final StudentRepository studentRepository;
 
-    // Sepeti getir (GetCart)
+    // Get cart for student
     public Cart getCart(Long studentId) {
         return cartRepository.findByStudentId(studentId)
                 .orElseGet(() -> createEmptyCart(studentId));
     }
 
-    // Sepete kurs ekle (AddCourseToCart)
+    // Add course to cart
     public Cart addCourseToCart(Long studentId, Long courseId) {
         Cart cart = getCart(studentId);
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("Kurs bulunamadı: " + courseId));
+                .orElseThrow(() -> new RuntimeException("Course not found: " + courseId));
 
-        // Kurs müsait mi kontrol et
+        // Check if course can be enrolled (includes teacher active check)
         if (!course.canEnroll()) {
-            throw new RuntimeException("Bu kursa kayıt yapılamaz");
+            throw new RuntimeException("Cannot enroll in this course");
         }
 
-        // Zaten sepette var mı kontrol et
+        // Check if already in cart
         if (cartItemRepository.findByCartIdAndCourseId(cart.getId(), courseId).isPresent()) {
-            throw new RuntimeException("Kurs zaten sepette");
+            throw new RuntimeException("Course already in cart");
         }
 
-        // Sepete ekle
+        // Add to cart
         CartItem item = new CartItem();
         item.setCart(cart);
         item.setCourse(course);
@@ -54,12 +54,12 @@ public class CartService {
         return cartRepository.save(cart);
     }
 
-    // Sepetten kurs çıkar (RemoveCourseFromCart)
+    // Remove course from cart
     public Cart removeCourseFromCart(Long studentId, Long courseId) {
         Cart cart = getCart(studentId);
         cartItemRepository.deleteByCartIdAndCourseId(cart.getId(), courseId);
 
-        // Cart'ı yeniden yükle
+        // Reload cart
         cart = cartRepository.findById(cart.getId()).orElse(cart);
         cart.getItems().removeIf(item -> item.getCourse().getId().equals(courseId));
         cart.calculateTotalPrice();
@@ -67,14 +67,14 @@ public class CartService {
         return cartRepository.save(cart);
     }
 
-    // Sepet güncelle (UpdateCart)
+    // Update cart
     public Cart updateCart(Long studentId) {
         Cart cart = getCart(studentId);
         cart.calculateTotalPrice();
         return cartRepository.save(cart);
     }
 
-    // Sepeti boşalt (EmptyCart)
+    // Empty cart
     public void emptyCart(Long studentId) {
         Cart cart = getCart(studentId);
         cartItemRepository.deleteAll(cart.getItems());
@@ -85,7 +85,7 @@ public class CartService {
 
     private Cart createEmptyCart(Long studentId) {
         Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("Öğrenci bulunamadı: " + studentId));
+                .orElseThrow(() -> new RuntimeException("Student not found: " + studentId));
 
         Cart cart = new Cart();
         cart.setStudent(student);

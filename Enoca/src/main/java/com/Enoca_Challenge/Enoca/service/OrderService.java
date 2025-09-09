@@ -20,18 +20,18 @@ public class OrderService {
     private final StudentRepository studentRepository;
     private final CourseRepository courseRepository;
 
-    // Sipariş ver (PlaceOrder)
+    // Place order from cart
     public CustomerOrder placeOrder(Long studentId) {
         Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("Öğrenci bulunamadı: " + studentId));
+                .orElseThrow(() -> new RuntimeException("Student not found: " + studentId));
 
         Cart cart = cartService.getCart(studentId);
 
         if (cart.getItems().isEmpty()) {
-            throw new RuntimeException("Sepet boş");
+            throw new RuntimeException("Cart is empty");
         }
 
-        // Sipariş oluştur
+        // Create order
         CustomerOrder order = new CustomerOrder();
         order.setStudent(student);
         order.setStatus(CustomerOrder.OrderStatus.CONFIRMED);
@@ -39,19 +39,24 @@ public class OrderService {
 
         CustomerOrder savedOrder = customerOrderRepository.save(order);
 
-        // Sepet itemlarını siparişe aktar ve öğrenciyi kurslara kaydet
+        // Transfer cart items to order and enroll students in courses
         for (CartItem cartItem : cart.getItems()) {
-            // OrderItem oluştur
+            // Verify course is still available and teacher is active
+            Course course = cartItem.getCourse();
+            if (!course.canEnroll()) {
+                throw new RuntimeException("Course no longer available: " + course.getTitle());
+            }
+
+            // Create order item
             OrderItem orderItem = new OrderItem();
             orderItem.setCustomerOrder(savedOrder);
-            orderItem.setCourse(cartItem.getCourse());
+            orderItem.setCourse(course);
             orderItem.setPrice(cartItem.getPrice());
 
             OrderItem savedOrderItem = orderItemRepository.save(orderItem);
             savedOrder.getItems().add(savedOrderItem);
 
-            // Öğrenciyi kursa kaydet
-            Course course = cartItem.getCourse();
+            // Enroll student in course
             if (course.getEnrolledStudents() == null) {
                 course.setEnrolledStudents(new HashSet<>());
             }
@@ -59,38 +64,38 @@ public class OrderService {
             course.setCurrentStudents(course.getCurrentStudents() + 1);
             courseRepository.save(course);
 
-            // Student'in courses listesine de ekle
+            // Add course to student's enrolled courses
             if (student.getCourses() == null) {
                 student.setCourses(new HashSet<>());
             }
             student.getCourses().add(course);
         }
 
-        // Öğrenciyi kaydet
+        // Save student
         studentRepository.save(student);
 
-        // Toplam fiyatı hesapla ve kaydet
+        // Calculate total price and save order
         savedOrder.calculateTotalPrice();
         savedOrder = customerOrderRepository.save(savedOrder);
 
-        // Sepeti boşalt
+        // Empty cart
         cartService.emptyCart(studentId);
 
         return savedOrder;
     }
 
-    // Sipariş koduna göre getir (GetOrderForCode)
+    // Get order by code
     public CustomerOrder getOrderForCode(String orderCode) {
         return customerOrderRepository.findByOrderCode(orderCode)
-                .orElseThrow(() -> new RuntimeException("Sipariş bulunamadı: " + orderCode));
+                .orElseThrow(() -> new RuntimeException("Order not found: " + orderCode));
     }
 
-    // Müşterinin tüm siparişleri (GetAllOrdersForCustomer)
+    // Get all orders for customer
     public List<CustomerOrder> getAllOrdersForCustomer(Long studentId) {
         return customerOrderRepository.findByStudentId(studentId);
     }
 
-    // Tüm siparişleri getir (Admin için)
+    // Get all orders (for admin)
     public List<CustomerOrder> getAllOrders() {
         return customerOrderRepository.findAll();
     }

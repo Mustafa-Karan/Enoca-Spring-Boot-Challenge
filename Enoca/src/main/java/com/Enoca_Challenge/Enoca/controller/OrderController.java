@@ -1,4 +1,5 @@
 package com.Enoca_Challenge.Enoca.controller;
+
 import com.Enoca_Challenge.Enoca.entity.CustomerOrder;
 import com.Enoca_Challenge.Enoca.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -13,24 +14,36 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    // Sipariş ver (PlaceOrder)
+    // Place order
     @PostMapping("/students/{studentId}/orders")
     public ResponseEntity<CustomerOrder> placeOrder(@PathVariable Long studentId) {
-        CustomerOrder order = orderService.placeOrder(studentId);
-        return ResponseEntity.ok(order);
+        try {
+            CustomerOrder order = orderService.placeOrder(studentId);
+            return ResponseEntity.ok(order);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    // Sipariş koduna göre getir (GetOrderForCode)
+    // Get order by code
     @GetMapping("/orders/{orderCode}")
     public ResponseEntity<CustomerOrder> getOrderForCode(@PathVariable String orderCode) {
-        CustomerOrder order = orderService.getOrderForCode(orderCode);
-        return ResponseEntity.ok(order);
+        try {
+            CustomerOrder order = orderService.getOrderForCode(orderCode);
+            return ResponseEntity.ok(order);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    // Müşterinin tüm siparişleri (GetAllOrdersForCustomer)
+    // Get all orders for customer
     @GetMapping("/students/{studentId}/orders")
     public ResponseEntity<List<CustomerOrder>> getAllOrdersForCustomer(@PathVariable Long studentId) {
-        List<CustomerOrder> orders = orderService.getAllOrdersForCustomer(studentId);
-        return ResponseEntity.ok(orders);
+        try {
+            List<CustomerOrder> orders = orderService.getAllOrdersForCustomer(studentId);
+            return ResponseEntity.ok(orders);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

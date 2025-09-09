@@ -13,34 +13,34 @@ public class TeacherService {
 
     private final TeacherRepository teacherRepository;
 
-    // Öğretmenleri getir (GetTeachers)
+    // Get all active teachers
     public List<Teacher> getTeachers() {
         return teacherRepository.findByIsActiveTrue();
     }
 
-    // Tek öğretmen getir
+    // Get teacher by ID
     public Teacher getTeacherById(Long id) {
         return teacherRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Öğretmen bulunamadı: " + id));
+                .orElseThrow(() -> new RuntimeException("Teacher not found: " + id));
     }
 
-    // Öğretmen oluştur (CreateTeacher)
+    // Create new teacher
     public Teacher createTeacher(Teacher teacher) {
         if (teacherRepository.existsByEmail(teacher.getEmail())) {
-            throw new RuntimeException("Bu email zaten kayıtlı: " + teacher.getEmail());
+            throw new RuntimeException("Email already exists: " + teacher.getEmail());
         }
         return teacherRepository.save(teacher);
     }
 
-    // Öğretmen güncelle (UpdateTeacher)
+    // Update teacher
     public Teacher updateTeacher(Long id, Teacher teacherData) {
         Teacher teacher = teacherRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Öğretmen bulunamadı: " + id));
+                .orElseThrow(() -> new RuntimeException("Teacher not found: " + id));
 
-        // Email güncelleniyorsa, başka birinde var mı kontrol et
+        // Check if email is being updated and if it already exists
         if (!teacher.getEmail().equals(teacherData.getEmail()) &&
                 teacherRepository.existsByEmail(teacherData.getEmail())) {
-            throw new RuntimeException("Bu email zaten kayıtlı: " + teacherData.getEmail());
+            throw new RuntimeException("Email already exists: " + teacherData.getEmail());
         }
 
         teacher.setFirstName(teacherData.getFirstName());
@@ -52,10 +52,10 @@ public class TeacherService {
         return teacherRepository.save(teacher);
     }
 
-    // Öğretmen sil (DeleteTeacher) - Soft delete
+    // Delete teacher (soft delete)
     public void deleteTeacher(Long id) {
         Teacher teacher = teacherRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Öğretmen bulunamadı: " + id));
+                .orElseThrow(() -> new RuntimeException("Teacher not found: " + id));
 
         teacher.setIsActive(false);
         teacherRepository.save(teacher);

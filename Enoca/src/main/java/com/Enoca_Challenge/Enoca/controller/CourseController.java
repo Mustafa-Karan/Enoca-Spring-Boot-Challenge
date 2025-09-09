@@ -15,7 +15,7 @@ public class CourseController {
 
     private final CourseService courseService;
 
-    // Tüm kursları getir
+    // Get all available courses
     @GetMapping("/courses")
     public ResponseEntity<List<Course>> getAllCourses() {
         try {
@@ -26,7 +26,7 @@ public class CourseController {
         }
     }
 
-    // Tek kurs getir
+    // Get single course
     @GetMapping("/courses/{id}")
     public ResponseEntity<Course> getCourse(@PathVariable Long id) {
         try {
@@ -37,7 +37,7 @@ public class CourseController {
         }
     }
 
-    // Öğretmenin kurslarını getir (GetAllCoursesForTeacher)
+    // Get all courses for teacher
     @GetMapping("/teachers/{teacherId}/courses")
     public ResponseEntity<List<Course>> getAllCoursesForTeacher(@PathVariable Long teacherId) {
         try {
@@ -48,7 +48,7 @@ public class CourseController {
         }
     }
 
-    // Öğrencinin kurslarını getir (GetCoursesForStudent)
+    // Get courses for student
     @GetMapping("/students/{studentId}/courses")
     public ResponseEntity<List<Course>> getCoursesForStudent(@PathVariable Long studentId) {
         try {
@@ -59,7 +59,7 @@ public class CourseController {
         }
     }
 
-    // Öğretmen için kurs oluştur (CreateCourseForTeacher)
+    // Create course for teacher
     @PostMapping("/teachers/{teacherId}/courses")
     public ResponseEntity<Course> createCourseForTeacher(@PathVariable Long teacherId, @RequestBody Course course) {
         try {
@@ -70,7 +70,7 @@ public class CourseController {
         }
     }
 
-    // Öğretmenin kursunu güncelle (UpdateCourseForTeacher)
+    // Update course for teacher
     @PutMapping("/teachers/{teacherId}/courses/{courseId}")
     public ResponseEntity<Course> updateCourseForTeacher(
             @PathVariable Long teacherId,
@@ -84,16 +84,16 @@ public class CourseController {
         }
     }
 
-    // Öğretmenin kursunu sil (DeleteCourseForTeacher)
+    // Delete course for teacher
     @DeleteMapping("/teachers/{teacherId}/courses/{courseId}")
     public ResponseEntity<String> deleteCourseForTeacher(
             @PathVariable Long teacherId,
             @PathVariable Long courseId) {
         try {
             courseService.deleteCourseForTeacher(teacherId, courseId);
-            return ResponseEntity.ok("Kurs silindi");
+            return ResponseEntity.ok("Course deleted successfully");
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body("Hata: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }
 }

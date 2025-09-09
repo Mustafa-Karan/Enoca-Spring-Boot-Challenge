@@ -15,20 +15,19 @@ import java.util.Set;
 @Data
 @EqualsAndHashCode(callSuper = true, exclude = {"student", "items"})
 @ToString(exclude = {"student", "items"})
-public class Cart extends Base_Entity {
+public class Cart extends BaseEntity {
 
     @JsonIgnore
     @OneToOne
-    @JoinColumn(name = "student_id")
     private Student student;
 
-    @Column(name = "total_price", precision = 10, scale = 2)
+    @Column(precision = 10, scale = 2)
     private BigDecimal totalPrice = BigDecimal.ZERO;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CartItem> items = new HashSet<>();
 
-    // Toplam fiyatı hesapla
+    // Calculate total price from cart items
     public void calculateTotalPrice() {
         this.totalPrice = items.stream()
                 .map(CartItem::getPrice)
