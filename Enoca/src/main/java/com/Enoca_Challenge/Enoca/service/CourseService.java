@@ -34,7 +34,7 @@ public class CourseService {
         return course;
     }
 
-    // FIXED: Get all courses for teacher - now properly uses repository method
+    // Get all courses for teacher - now properly uses repository method
     public List<Course> getAllCoursesForTeacher(Long teacherId) {
         // First verify teacher exists and is active
         Teacher teacher = teacherRepository.findById(teacherId)
@@ -44,7 +44,6 @@ public class CourseService {
             throw new RuntimeException("Teacher is inactive - no courses available");
         }
 
-        // Use the repository method that filters for active teachers and returns empty list if inactive
         return courseRepository.findByTeacherIdAndTeacherActive(teacherId);
     }
 
