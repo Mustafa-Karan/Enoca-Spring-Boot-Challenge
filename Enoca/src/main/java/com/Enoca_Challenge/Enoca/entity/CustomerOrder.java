@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "orders")
+@Table(name = "customer_orders") // Fixed: Changed from "orders" to avoid PostgreSQL reserved keyword
 @Data
 @EqualsAndHashCode(callSuper = true, exclude = {"student", "items"})
 @ToString(exclude = {"student", "items"})

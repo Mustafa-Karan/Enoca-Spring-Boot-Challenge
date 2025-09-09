@@ -34,16 +34,17 @@ public class CourseService {
         return course;
     }
 
-    // Get all courses for active teacher
+    // FIXED: Get all courses for teacher - now properly checks if teacher is active
     public List<Course> getAllCoursesForTeacher(Long teacherId) {
-        // First verify teacher is active
+        // First verify teacher exists and is active
         Teacher teacher = teacherRepository.findById(teacherId)
                 .orElseThrow(() -> new RuntimeException("Teacher not found: " + teacherId));
 
         if (!teacher.getIsActive()) {
-            throw new RuntimeException("Teacher is inactive");
+            throw new RuntimeException("Teacher is inactive - no courses available");
         }
 
+        // Use the repository method that already filters for active teachers
         return courseRepository.findByTeacherIdAndTeacherActive(teacherId);
     }
 
@@ -96,6 +97,8 @@ public class CourseService {
             throw new RuntimeException("This course does not belong to this teacher");
         }
 
+        // No need to check if teacher is active for deletion
+        // Even inactive teachers should be able to delete their courses
         course.setIsActive(false);
         courseRepository.save(course);
     }

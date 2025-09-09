@@ -70,23 +70,23 @@ UPDATE carts SET total_price = 529.99 WHERE id = 2;  -- Ali: 529.99
 UPDATE carts SET total_price = 389.99 WHERE id = 3;  -- Zeynep: 389.99
 
 -- ==============================
--- SAMPLE ORDERS (Completed orders)
+-- SAMPLE ORDERS (Completed orders) - FIXED TABLE NAME
 -- ==============================
-INSERT INTO orders (id, order_code, student_id, total_price, status, is_active, created_at, updated_at)
+INSERT INTO customer_orders (id, order_code, student_id, total_price, status, is_active, created_at, updated_at)
 VALUES
 (1, 'ENOCA-2024-001', 4, 449.99, 'CONFIRMED', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (2, 'ENOCA-2024-002', 5, 918.98, 'CONFIRMED', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- ==============================
--- ORDER ITEMS (Order details)
+-- ORDER ITEMS (Order details) - FIXED COLUMN NAME
 -- ==============================
 -- Emre's order (Spring Boot)
-INSERT INTO order_items (id, order_id, course_id, price, is_active, created_at, updated_at)
+INSERT INTO order_items (id, customer_order_id, course_id, price, is_active, created_at, updated_at)
 VALUES
 (1, 1, 1, 449.99, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- Seda's order (React + Flutter)
-INSERT INTO order_items (id, order_id, course_id, price, is_active, created_at, updated_at)
+INSERT INTO order_items (id, customer_order_id, course_id, price, is_active, created_at, updated_at)
 VALUES
 (2, 2, 2, 389.99, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (3, 2, 3, 529.99, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
