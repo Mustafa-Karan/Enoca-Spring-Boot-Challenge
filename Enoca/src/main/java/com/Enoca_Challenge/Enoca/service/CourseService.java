@@ -34,7 +34,7 @@ public class CourseService {
         return course;
     }
 
-    // FIXED: Get all courses for teacher - now properly checks if teacher is active
+    // FIXED: Get all courses for teacher - now properly uses repository method
     public List<Course> getAllCoursesForTeacher(Long teacherId) {
         // First verify teacher exists and is active
         Teacher teacher = teacherRepository.findById(teacherId)
@@ -44,7 +44,7 @@ public class CourseService {
             throw new RuntimeException("Teacher is inactive - no courses available");
         }
 
-        // Use the repository method that already filters for active teachers
+        // Use the repository method that filters for active teachers and returns empty list if inactive
         return courseRepository.findByTeacherIdAndTeacherActive(teacherId);
     }
 
@@ -68,6 +68,14 @@ public class CourseService {
 
     // Update course for teacher
     public Course updateCourseForTeacher(Long teacherId, Long courseId, Course courseData) {
+        // First check if teacher is active
+        Teacher teacher = teacherRepository.findById(teacherId)
+                .orElseThrow(() -> new RuntimeException("Teacher not found: " + teacherId));
+
+        if (!teacher.getIsActive()) {
+            throw new RuntimeException("Cannot update course - teacher is inactive");
+        }
+
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("Course not found: " + courseId));
 
@@ -75,8 +83,9 @@ public class CourseService {
             throw new RuntimeException("This course does not belong to this teacher");
         }
 
+        // Double check - course's teacher should also be active
         if (!course.getTeacher().getIsActive()) {
-            throw new RuntimeException("Cannot update course - teacher is inactive");
+            throw new RuntimeException("Cannot update course - course teacher is inactive");
         }
 
         course.setTitle(courseData.getTitle());
@@ -97,8 +106,7 @@ public class CourseService {
             throw new RuntimeException("This course does not belong to this teacher");
         }
 
-        // No need to check if teacher is active for deletion
-        // Even inactive teachers should be able to delete their courses
+        // Allow deletion even if teacher is inactive - they should be able to clean up
         course.setIsActive(false);
         courseRepository.save(course);
     }
